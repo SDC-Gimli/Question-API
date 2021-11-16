@@ -19,6 +19,7 @@
   "homepage": "https://github.com/SDC-Gimli/Question-API#readme",
   "devDependencies": {
     "express": "^4.17.1",
-    "pg": "^8.7.1"
+    "pg": "^8.7.1",
+    "pg-promise": "^10.11.1"
   }
 }
