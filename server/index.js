@@ -13,6 +13,14 @@ app.get('/', (req, res) => {
 
 app.get('/questions', (req, res) => {
   // fetch all the answer, this function should format the questions.
+
+  let product_id = req.query.product_id;
+
+  let queryStr = `select * from questions where product_id = ${product_id}`;
+  db.query(queryStr)
+    .then((data) => res.send(data))
+    .catch((err) => console.log('server err', err));
+
 })
 
 
