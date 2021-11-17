@@ -12,3 +12,8 @@ create table answers (
     foreign key (question_id)
       references questions(id)
 );
+
+\copy answers (id, question_id, body, date_written, answerer_name, answerer_email, reported, helpful)
+from '/Users/ximing_chen/Desktop/work/SDC/data/answers.csv'
+delimiter ','
+csv header;
