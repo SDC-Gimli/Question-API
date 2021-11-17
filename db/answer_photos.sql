@@ -1,9 +1,14 @@
-create table photos {
-  id serial,
-  answer_id int,
-  url varchar (300),
-  primary key (id),
-  constraint fk_answer
-    foreign key (answer_id)
-      references answer(id)
-};
+CREATE TABLE photos (
+  id SERIAL,
+  answer_id INT,
+  url VARCHAR (255),
+  PRIMARY KEY (id),
+  CONSTRAINT fk_answer
+    FOREIGN KEY(answer_id)
+      REFERENCES answers(id)
+);
+
+\copy photos (id, answer_id, url)
+from '/Users/ximing_chen/Desktop/work/SDC/data/answers_photos.csv'
+delimiter ','
+csv header;
