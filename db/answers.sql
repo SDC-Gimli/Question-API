@@ -17,3 +17,4 @@ create table answers (
 from '/Users/ximing_chen/Desktop/work/SDC/data/answers.csv'
 delimiter ','
 csv header;
+CREATE INDEX question_idx ON answers (question_id);
