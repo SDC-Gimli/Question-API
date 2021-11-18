@@ -98,6 +98,8 @@ app.get('/questions', async (req, res) => {
 
 });
 
+// post questions api
+
 app.post('/questions', async (req, res) => {
 
   const question_body = req.body.question_body;
@@ -105,9 +107,9 @@ app.post('/questions', async (req, res) => {
   const asker_email = req.body.asker_email;
   const product_id = req.body.product_id;
 
-  const id = await db.query('SELECT MAX(id) from questions')
+  const id = await db.query('select MAX(id) from questions')
     .catch(() => {
-      console.log('get id err');
+      console.log('get question id err');
       res.sendStatus(500);
     });
 
@@ -144,11 +146,91 @@ app.post('/questions', async (req, res) => {
     false,
     0
   ])
-    .then((msg) => res.send(msg))
+    .then(() => res.sendStatus(201))
     .catch(err => {
-      console.log('question post err', err);
+      console.log('question post ', err);
       res.sendStatus(500);
     })
+});
+
+// post answer api
+
+app.post('/answers', async (req, res) => {
+  const body = req.body.body;
+  const name = req.body.name;
+  const email = req.body.email;
+  const question_id = req.body.question_id;
+  const photos = req.body.photos || null;
+
+  const id = await db.query(`select max(id) from answers`)
+    .catch(err => console.log('get answer id err'));
+
+  const imgId = await db.query('select max(id) from photos')
+    .catch(err => console.log('get photo id err'));
+
+
+  const aPost = `
+    insert into
+      answers (
+        id,
+        question_id,
+        body,
+        date_written,
+        answerer_name,
+        answerer_email,
+        reported,
+        helpful
+      )
+      values (
+        $1,
+        $2,
+        $3,
+        $4,
+        $5,
+        $6,
+        $7,
+        $8
+      )`;
+
+      const imgPost = `
+      insert into
+        photos (
+          id,
+          answer_id,
+          url
+        )
+        values (
+          $1,
+          $2,
+          $3
+        )`;
+
+  await db.none(aPost, [
+    id[0].max + 1,
+    question_id,
+    body,
+    Date.now(),
+    name,
+    email,
+    false,
+    0
+  ])
+    .then(() => {
+      if (photos) {
+        db.none(imgPost, [
+          imgId[0].max + 1,
+          id[0].max + 1,
+          photos
+        ]).catch(err => console.log('photos', err))
+      }
+    })
+    .then(() => res.sendStatus(201))
+    .catch((err) => {
+      console.log('post answer ', err);
+      res.sendStatus(500);
+    });
+
+
 });
 
 
