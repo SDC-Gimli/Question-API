@@ -12,3 +12,4 @@ CREATE TABLE photos (
 from '/Users/ximing_chen/Desktop/work/SDC/data/answers_photos.csv'
 delimiter ','
 csv header;
+CREATE INDEX question_idx ON answers (question_id);
