@@ -25,6 +25,7 @@ app.get('/answers', (req, res) => {
       to_timestamp(answers.date_written/1000) as date,
       answers.answerer_name,
       answers.helpful as helpfulness,
+      reported,
       json_agg
         (json_build_object
             ('id', photos.id,
@@ -160,7 +161,7 @@ app.post('/answers', async (req, res) => {
   const name = req.body.name;
   const email = req.body.email;
   const question_id = req.body.question_id;
-  const photos = req.body.photos || null;
+  const photos = req.body.photos;
 
   const id = await db.query(`select max(id) from answers`)
     .catch(err => console.log('get answer id err'));
@@ -216,7 +217,7 @@ app.post('/answers', async (req, res) => {
     0
   ])
     .then(() => {
-      if (photos) {
+      if (photos.length > 0) {
         for(let i = 0; i < photos.length; i++) {
 
            db.none(imgPost, [
@@ -278,6 +279,36 @@ app.put('/answers/helpfulness', async (req, res) => {
     console.log('update answer helpfulness', err);
     res.sendStatus(400);
   })
+});
+
+//update question report
+app.put ('/questions/report', async (req, res) => {
+  const question_id = req.body.question_id;
+
+  const reportStr = `
+    update questions
+      set reported = ${true}
+      where id = ${question_id}
+    `;
+
+    db.none(reportStr)
+    .then(() => res.sendStatus(200))
+    .catch(err => console.log ('report question', err));
+});
+
+//update answer report
+app.put ('/answers/report', async (req, res) => {
+  const answer_id = req.body.answer_id;
+
+  const reportStr = `
+    update answers
+      set reported = ${true}
+      where id = ${answer_id}
+    `;
+
+    db.none(reportStr)
+    .then(() => {res.sendStatus(200)})
+    .catch(err => console.log ('report answer', err));
 });
 
 app.listen(port, () => {
