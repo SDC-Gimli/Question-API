@@ -217,11 +217,15 @@ app.post('/answers', async (req, res) => {
   ])
     .then(() => {
       if (photos) {
-        db.none(imgPost, [
-          imgId[0].max + 1,
-          id[0].max + 1,
-          photos
-        ]).catch(err => console.log('photos', err))
+        for(let i = 0; i < photos.length; i++) {
+
+           db.none(imgPost, [
+            imgId[0].max + 1 + i,
+            id[0].max + 1,
+            photos
+          ]).catch(err => console.log('photos', err))
+
+        }
       }
     })
     .then(() => res.sendStatus(201))
@@ -233,6 +237,48 @@ app.post('/answers', async (req, res) => {
 
 });
 
+
+// update question helpfulness
+
+app.put('/questions/helpfulness', async (req, res) => {
+  const question_id = req.body.question_id;
+
+  const currHelpfulness = await db.query(`select helpful from questions where id = ${question_id}`);
+
+  const helpStr = `
+    update questions
+      set helpful = ${currHelpfulness[0].helpful + 1}
+      where id = ${question_id}`;
+
+  db.none(helpStr)
+  .then(() => res.sendStatus(200))
+  .catch(err => {
+    console.log('update question helpfulness', err);
+    res.sendStatus(400);
+  })
+});
+
+
+
+// update answer helpfulness
+
+app.put('/answers/helpfulness', async (req, res) => {
+  const answer_id = req.body.answer_id;
+
+  const currHelpfulness = await db.query(`select helpful from answers where id = ${answer_id}`);
+
+  const helpStr = `
+    update answers
+      set helpful = ${currHelpfulness[0].helpful + 1}
+      where id = ${answer_id}`;
+
+  db.none(helpStr)
+  .then(() => res.sendStatus(200))
+  .catch(err => {
+    console.log('update answer helpfulness', err);
+    res.sendStatus(400);
+  })
+});
 
 app.listen(port, () => {
   console.log(`listening at port: ${port}`);
