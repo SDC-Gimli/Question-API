@@ -1,5 +1,16 @@
 import getQuestions from '../server/getQuestions.js';
 import getAnswers from '../server/getAnswers.js';
+import postQuestion from '../server/postQuestion.js';
+import postAnswer from '../server/postAnswer.js';
+import db from '../db';
+
+const deleteQuestion = async (id) => {
+  await db.query(`delete from questions where id = ${id}`);
+};
+
+const deleteAnswer = async (id) => {
+  await db.query(`delete from answers where id = ${id}`)
+};
 
 describe('get questions', () => {
 
@@ -56,7 +67,6 @@ describe ('get answers', () => {
 
     expect(typeof res.data).toEqual('object');
     expect(Array.isArray(res.data)).toEqual(true);
-    expect(res.data[0].photos).toBeDefined();
   });
 
   it('should includes photos in the answers', async () => {
@@ -76,5 +86,130 @@ describe ('get answers', () => {
       expect(a.photos).toBeDefined();
     }
 
+  });
+
+})
+
+describe ('post question',  () => {
+
+  it('should be able to post a question', async () => {
+    let maxId = await db.query('select MAX(id) from questions');
+    const req = {
+      body: {
+        product_id: 88,
+        question_body: 'testing Jest',
+        asker_name: 'builder',
+        asker_email: 'lalal@gmail.com'
+      }
+    };
+
+    const res = {
+      status: 0,
+      sendStatus: (num) => {res.status = num}
+    };
+
+    await postQuestion(req, res);
+
+    let id = await db.query('select MAX(id) from questions');
+
+    expect(id[0].max).toEqual(maxId[0].max + 1);
+    expect(res.status).toEqual(201);
+
+    //delete the question
+    deleteQuestion(id[0].max);
+  });
+
+  it('question content should be correct', async () => {
+    let maxId = await db.query('select MAX(id) from questions');
+    const req = {
+      body: {
+        product_id: 88,
+        question_body: 'testing Jest',
+        asker_name: 'builder',
+        asker_email: 'lalal@gmail.com'
+      }
+    };
+
+    const res = {
+      status: 0,
+      sendStatus: (num) => {res.status = num}
+    };
+
+    postQuestion(req, res);
+
+    let id = await db.query('select MAX(id) from questions');
+    let question = await db.query(`select * from questions where id = ${id[0].max}`);
+
+    expect(question[0].body).toEqual(req.body.question_body);
+    expect(question[0].product_id).toEqual(req.body.product_id);
+    expect(question[0].asker_email).toEqual(req.body.asker_email);
+    expect(question[0].asker_name).toEqual(req.body.asker_name);
+    expect(res.status).toEqual(201);
+
+    //delete the question
+    deleteQuestion(id[0].max);
+  });
+})
+
+describe ('post answer', () => {
+
+  it('should post an answer', async () => {
+    const maxId = await db.query('select max(id) from answers');
+
+    const req = {
+      body: {
+        question_id: 289,
+        body: 'jest test',
+        name: 'test',
+        email: 'test@gmail.com',
+        photos: []
+      }
+    };
+
+    const res = {
+      status: 0,
+      sendStatus: (num) => {res.status = num}
+    };
+
+    await postAnswer (req, res);
+
+    let id = await db.query(`select max(id) from answers`);
+
+    expect(id[0].max).toEqual(maxId[0].max + 1);
+    expect(res.status).toEqual(201);
+
+    deleteAnswer(id[0].max);
+  });
+
+  it('answer content should match', async () => {
+    let maxId = await db.query('select max(id) from answers');
+    console.log(maxId[0].max)
+    const req = {
+      body: {
+        question_id: 289,
+        body: 'jest test',
+        name: 'test',
+        email: 'test@gmail.com',
+        photos: []
+      }
+    };
+
+    const res = {
+      status: 0,
+      sendStatus: (num) => {res.status = num}
+    };
+
+    await postAnswer (req, res);
+
+    let id = await db.query(`select max(id) from answers`);
+    let answer = await db.query (`select * from answers where id = ${id[0].max}`);
+
+    expect(answer[0].question_id).toEqual(req.body.question_id);
+    expect(answer[0].body).toEqual(req.body.body);
+    expect(answer[0].answerer_name).toEqual(req.body.name);
+    expect(answer[0].answerer_email).toEqual(req.body.email);
+    expect(res.status).toEqual(201);
+
+    await deleteAnswer(id[0].max);
   });
 })

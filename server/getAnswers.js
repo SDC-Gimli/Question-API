@@ -5,7 +5,6 @@ const getAnswers = async (req, res) => {
 
   let question_id = req.query.question_id;
   let response = {};
-  // const aStr = `select id, body, to_timestamp(date_written/1000) as date, answerer_name, helpful as helpfulness from answers where question_id = 1 order by helpfulness desc`;
 
   const aStr = `
     SELECT
