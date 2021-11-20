@@ -10,7 +10,7 @@ const reportQuestion = async (req, res) => {
       where id = ${question_id}
     `;
 
-    db.none(reportStr)
+   await db.none(reportStr)
     .then(() => res.sendStatus(200))
     .catch(err => console.log ('report question', err));
 };
