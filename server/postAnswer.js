@@ -62,13 +62,13 @@ const postAnswer = async (req, res) => {
     0
   ])
     .then(() => {
-      if (photos.length > 0) {
+      if (photos && photos.length > 0) {
         for(let i = 0; i < photos.length; i++) {
 
            db.none(imgPost, [
             imgId[0].max + 1 + i,
             id[0].max + 1,
-            photos
+            photos[i]
           ]).catch(err => console.log('photos', err))
 
         }
