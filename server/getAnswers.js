@@ -1,4 +1,5 @@
 const db = require('../db/index.js');
+require ('regenerator-runtime/runtime');
 
 const getAnswers = async (req, res) => {
 
@@ -26,7 +27,7 @@ const getAnswers = async (req, res) => {
       GROUP BY answers.id
       order by helpfulness desc`;
 
-  db.query(aStr)
+  await db.query(aStr)
     .then(data => {
       res.send(data)
     })

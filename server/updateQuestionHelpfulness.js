@@ -1,5 +1,6 @@
 const db = require('../db/index.js');
 
+
 const updateQuestionHelpfulness = async (req, res) => {
   const question_id = req.body.question_id;
 

@@ -1,5 +1,6 @@
 const db = require('../db/index.js');
 
+
 const postQuestion = async (req, res) => {
 
   const question_body = req.body.question_body;

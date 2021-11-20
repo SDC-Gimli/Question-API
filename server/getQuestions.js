@@ -1,4 +1,5 @@
 const db = require('../db/index.js');
+require ('regenerator-runtime/runtime');
 
 const getQuestions = async (req, res) => {
   // fetch all the questions and answers, this function should format the questions.
@@ -86,7 +87,6 @@ const getQuestions = async (req, res) => {
   //     console.log('query question err', err);
   //     res.sendStatus(500);
   //   });
-
 };
 
 module.exports = getQuestions;
