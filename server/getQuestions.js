@@ -24,6 +24,7 @@ const getQuestions = async (req, res) => {
 
   for (let q of response.results) {
     let id = q.question_id;
+    q.answers = {};
     let query = `
     SELECT
       answers.id as answer_id,
@@ -47,8 +48,12 @@ const getQuestions = async (req, res) => {
       .catch(err => res.sendStatus(500));
 
       for (let a of answers) {
-        q.answers = {};
+
         q.answers[a.answer_id] = a;
+
+        if(a.photos[0].id === null) {
+          a.photos = [];
+        }
       }
   }
   res.send(response);

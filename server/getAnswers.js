@@ -29,6 +29,11 @@ const getAnswers = async (req, res) => {
 
   await db.query(aStr)
     .then(data => {
+      for(let a of data) {
+        if(a.photos[0].id === null) {
+          a.photos = [];
+        }
+      }
       res.send(data)
     })
     .catch(err => {
