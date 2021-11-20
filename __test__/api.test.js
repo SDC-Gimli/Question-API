@@ -2,6 +2,11 @@ import getQuestions from '../server/getQuestions.js';
 import getAnswers from '../server/getAnswers.js';
 import postQuestion from '../server/postQuestion.js';
 import postAnswer from '../server/postAnswer.js';
+import updateQuestionHelpfulness from '../server/updateQuestionHelpfulness.js';
+import reportQuestion from '../server/reportQuestion.js';
+import updateAnswerHelpfulness from '../server/updateAnswerHelpfulness.js';
+import reportAnswer from '../server/reportAnswer.js';
+
 import db from '../db';
 
 const deleteQuestion = async (id) => {
@@ -11,6 +16,14 @@ const deleteQuestion = async (id) => {
 const deleteAnswer = async (id) => {
   await db.query(`delete from answers where id = ${id}`)
 };
+
+const setFalse = async (table, id) => {
+  await db.query(`update ${table} set reported = ${false} where id = ${id}`);
+}
+
+const decrementHelpfulness = async (table, id, target) => {
+  await db.query(`update ${table} set helpful = ${target} where id = ${id}`);
+}
 
 describe('get questions', () => {
 
@@ -183,7 +196,7 @@ describe ('post answer', () => {
 
   it('answer content should match', async () => {
     let maxId = await db.query('select max(id) from answers');
-    console.log(maxId[0].max)
+
     const req = {
       body: {
         question_id: 289,
@@ -211,5 +224,106 @@ describe ('post answer', () => {
     expect(res.status).toEqual(201);
 
     await deleteAnswer(id[0].max);
+  });
+})
+
+describe ('question helpfulness and report', () => {
+
+  it('should update helpfulness' , async () => {
+    const req = {
+      body: {
+        question_id: 289
+      }
+    }
+
+    const res = {
+      status: 0,
+      sendStatus: (num) => res.status = num
+    };
+
+    let curr = await db.query(`select helpful from questions where id = 289`);
+
+    await updateQuestionHelpfulness(req, res);
+
+    let updated = await db.query(`select helpful from questions where id = 289`);
+
+    expect (updated[0].helpful).toEqual(curr[0].helpful + 1);
+    expect(res.status).toEqual(200);
+
+    decrementHelpfulness('questions', 289, curr[0].helpful);
+  });
+
+  it('should report the problem', async () => {
+    const req = {
+      body: {
+        question_id: 289
+      }
+    }
+
+    const res = {
+      status: 0,
+      sendStatus: (num) => res.status = num
+    };
+
+    let isReported = await db.query(`select reported from questions where id = 289`);
+
+    expect(isReported[0].reported).toEqual(false);
+
+    await reportQuestion(req, res);
+
+    isReported = await db.query(`select reported from questions where id = 289`);
+    expect(isReported[0].reported).toEqual(true);
+
+    setFalse('questions', 289);
+  });
+})
+
+describe ('answer helpfulness and report', () => {
+  it('should update helpfulness', async () => {
+    const req = {
+      body: {
+        answer_id: 6879320
+      }
+    };
+
+    const res = {
+      status: 0,
+      sendStatus: (num) => res.status = num
+    };
+
+    let curr = await db.query(`select helpful from answers where id = 6879320`);
+
+    await updateAnswerHelpfulness(req, res);
+
+    let updated = await db.query(`select helpful from answers where id = 6879320`);
+
+    expect(updated[0].helpful).toEqual(curr[0].helpful + 1);
+
+    decrementHelpfulness('answers', 6879320, curr[0].helpful);
+
+  });
+
+  it('should report an answer', async () => {
+    const req = {
+      body: {
+        answer_id: 6879320
+      }
+    };
+
+    const res = {
+      status: 0,
+      sendStatus: (num) => res.status = num
+    };
+
+    let isReported = await db.query(`select reported from answers where id = 6879320`);
+
+    expect(isReported[0].reported).toEqual(false);
+
+    await reportAnswer(req, res);
+
+    isReported = await db.query(`select reported from answers where id = 6879320`);
+    expect(isReported[0].reported).toEqual(true);
+
+    setFalse('answers', 6879320);
   });
 })

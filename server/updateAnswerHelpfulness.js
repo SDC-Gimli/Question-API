@@ -11,7 +11,7 @@ const updateAnswerHelpfulness = async (req, res) => {
       set helpful = ${currHelpfulness[0].helpful + 1}
       where id = ${answer_id}`;
 
-  db.none(helpStr)
+  await db.none(helpStr)
   .then(() => res.sendStatus(200))
   .catch(err => {
     console.log('update answer helpfulness', err);
