@@ -1,4 +1,5 @@
 const db = require('../db/index.js');
+require ('regenerator-runtime/runtime');
 
 const getQuestions = async (req, res) => {
   // fetch all the questions and answers, this function should format the questions.
@@ -23,6 +24,7 @@ const getQuestions = async (req, res) => {
 
   for (let q of response.results) {
     let id = q.question_id;
+    q.answers = {};
     let query = `
     SELECT
       answers.id as answer_id,
@@ -46,8 +48,12 @@ const getQuestions = async (req, res) => {
       .catch(err => res.sendStatus(500));
 
       for (let a of answers) {
-        q.answers = {};
+
         q.answers[a.answer_id] = a;
+
+        if(a.photos[0].id === null) {
+          a.photos = [];
+        }
       }
   }
   res.send(response);
@@ -86,7 +92,6 @@ const getQuestions = async (req, res) => {
   //     console.log('query question err', err);
   //     res.sendStatus(500);
   //   });
-
 };
 
 module.exports = getQuestions;
