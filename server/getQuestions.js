@@ -42,7 +42,8 @@ const getQuestions = async (req, res) => {
       LEFT JOIN photos
       ON photos.answer_id = answers.id
       WHERE question_id = ${id}
-      GROUP BY answers.id`;
+      GROUP BY answers.id
+      limit 30`;
 
       const answers = await db.query(query)
       .catch(err => res.sendStatus(500));
