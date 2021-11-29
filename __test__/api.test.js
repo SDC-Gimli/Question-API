@@ -38,6 +38,8 @@ describe('get questions', () => {
       }
     }
 
+    expect(res.data === '').toEqual(true);
+
     await getQuestions(req, res);
 
     expect(res.data === '').toEqual(false);
@@ -53,6 +55,7 @@ describe('get questions', () => {
         res.data = input;
       }
     }
+    expect(res.data === '').toEqual(true);
 
     await getQuestions(req, res);
 

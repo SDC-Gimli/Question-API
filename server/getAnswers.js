@@ -24,7 +24,8 @@ const getAnswers = async (req, res) => {
       ON photos.answer_id = answers.id
       WHERE question_id = ${question_id}
       GROUP BY answers.id
-      order by helpfulness desc`;
+      order by helpfulness desc
+      limit 20`;
 
   await db.query(aStr)
     .then(data => {
