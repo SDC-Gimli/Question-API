@@ -14,4 +14,5 @@ create table questions (
 from '/Users/ximing_chen/Desktop/work/SDC/data/questions.csv'
 delimiter ','
 csv header;
+
 CREATE INDEX product_idx on questions using hash (product_id);
