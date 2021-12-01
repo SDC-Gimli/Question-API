@@ -14,11 +14,11 @@ const getQuestions = async (req, res) => {
       body as question_body,
       to_timestamp(date_written/1000) as question_date,
       asker_name,
-      helpful as question_helpfullness,
+      helpful as question_helpfulness,
       reported
     from questions
     where product_id = ${product_id}
-    order by question_helpfullness desc`
+    order by question_helpfulness desc`
     )
     .catch(err => console.log(err))
 

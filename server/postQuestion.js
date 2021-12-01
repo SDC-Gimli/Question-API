@@ -3,9 +3,9 @@ const db = require('../db/index.js');
 
 const postQuestion = async (req, res) => {
 
-  const question_body = req.body.question_body;
-  const asker_name = req.body.asker_name;
-  const asker_email = req.body.asker_email;
+  const question_body = req.body.body;
+  const asker_name = req.body.name;
+  const asker_email = req.body.email;
   const product_id = req.body.product_id;
 
   const id = await db.query('select MAX(id) from questions')

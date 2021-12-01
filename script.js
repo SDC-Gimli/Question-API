@@ -7,6 +7,6 @@ export const options = {
 };
 
 export default function () {
-  http.get('http://localhost:3030/questions?product_id=3');
+  http.get('http://localhost:3000/answers?question_id=289');
   sleep(1);
 }
